@@ -1,0 +1,33 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:wght@400;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply font-lora text-academic-dark bg-academic-bg selection:bg-academic-sage selection:text-academic-bg;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-cinzel text-academic-olive tracking-wide;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-academic-olive text-academic-bg font-cinzel font-semibold py-2 px-6 rounded shadow-md hover:bg-academic-dark hover:shadow-lg transition-all duration-300;
+  }
+  
+  .btn-secondary {
+    @apply bg-academic-sand text-academic-dark font-cinzel font-semibold py-2 px-6 rounded shadow-sm hover:bg-academic-sage hover:text-academic-bg transition-all duration-300;
+  }
+  
+  .card-academic {
+    @apply bg-white rounded-lg border border-academic-sand shadow-sm hover:shadow-md transition-shadow duration-300 p-6;
+  }
+  
+  .input-academic {
+    @apply w-full p-3 border border-academic-sand rounded bg-white focus:outline-none focus:ring-2 focus:ring-academic-sage focus:border-academic-olive font-lora transition-all duration-300;
+  }
+}
