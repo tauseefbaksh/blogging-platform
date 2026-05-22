@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { ResourceCard } from './ResourceCard';
+import { useAuth } from '../context/AuthContext';
 
 export const StudentFeed = () => {
     const [resources, setResources] = useState([]);
     const [search, setSearch] = useState('');
     const [subject, setSubject] = useState('All');
+
+    // Extract the token to authorize the admin's delete request
+    const { token } = useAuth();
 
     const fetchResources = async () => {
         const query = new URLSearchParams();
@@ -33,23 +37,48 @@ export const StudentFeed = () => {
         }
     };
 
+    // NEW: The Incinerate Logic
+    const handleDelete = async (id) => {
+        if (!window.confirm("Are you sure you want to incinerate this manuscript? This cannot be undone.")) {
+            return;
+        }
+
+        try {
+            const res = await fetch(`/api/admin/resource/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (res.ok) {
+                // Instantly remove the card from the UI upon successful backend deletion
+                setResources(prev => prev.filter(r => r._id !== id));
+            } else {
+                alert("Failed to incinerate. Ensure you have Sovereign Admin privileges.");
+            }
+        } catch (error) {
+            console.error("Error incinerating resource:", error);
+        }
+    };
+
     return (
         <div className="max-w-6xl mx-auto animation-fade-in">
             <div className="text-center mb-12">
                 <h1 className="text-4xl font-cinzel font-bold text-academic-olive mb-4">The Grand Archive</h1>
                 <p className="text-lg font-lora text-academic-dark opacity-80 italic max-w-2xl mx-auto">Explore our curated collection of academic resources, tailored for scholars seeking enlightenment and mastery in their disciplines.</p>
             </div>
-            
+
             <div className="flex flex-col md:flex-row gap-6 mb-12 bg-white p-6 rounded-lg shadow-sm border border-academic-sand/50 items-center justify-between relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-1 h-full bg-academic-sage"></div>
                 <div className="w-full md:w-2/3">
                     <label className="block text-sm font-cinzel font-semibold text-academic-olive mb-2">Search the Archives</label>
                     <div className="relative">
-                        <input 
-                            type="text" 
-                            placeholder="e.g., Quantum Mechanics, React Hooks..." 
-                            className="input-academic pl-10" 
-                            onChange={e => setSearch(e.target.value)} 
+                        <input
+                            type="text"
+                            placeholder="e.g., Quantum Mechanics, React Hooks..."
+                            className="input-academic pl-10"
+                            onChange={e => setSearch(e.target.value)}
                         />
                         <span className="absolute left-3 top-3.5 opacity-50">🔍</span>
                     </div>
@@ -71,7 +100,8 @@ export const StudentFeed = () => {
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {resources.map(r => <ResourceCard key={r._id} resource={r} onLike={handleLike} />)}
+                    {/* NEW: Passed the handleDelete function down as the onDelete prop */}
+                    {resources.map(r => <ResourceCard key={r._id} resource={r} onLike={handleLike} onDelete={handleDelete} />)}
                 </div>
             )}
         </div>
