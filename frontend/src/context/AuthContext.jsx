@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { jwtDecode } from "jwt-decode";
 
@@ -16,6 +17,12 @@ export const AuthProvider = ({ children }) => {
         return null;
     });
 
+    const logout = () => {
+        localStorage.removeItem('token');
+        setToken(null);
+        setUser(null);
+    };
+
     useEffect(() => {
         if (token) {
             try {
@@ -25,18 +32,13 @@ export const AuthProvider = ({ children }) => {
                 logout();
             }
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [token]);
 
     const login = (newToken, userData) => {
         localStorage.setItem('token', newToken);
         setToken(newToken);
         setUser(userData);
-    };
-
-    const logout = () => {
-        localStorage.removeItem('token');
-        setToken(null);
-        setUser(null);
     };
 
     return (

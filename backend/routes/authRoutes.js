@@ -32,7 +32,8 @@ router.post('/login', async (req, res) => {
         );
         res.json({ token, user: { id: user._id, username: user.username, role: user.role, isApproved: user.isApproved } });
     } catch (error) {
-        res.status(500).json({ error: 'Login failed.' });
+        console.error("Login Error:", error);
+        res.status(500).json({ error: 'Login failed.', details: error.message });
     }
 });
 module.exports = router;

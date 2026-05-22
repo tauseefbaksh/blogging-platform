@@ -13,10 +13,16 @@ app.use(cors());
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+const { MongoMemoryServer } = require('mongodb-memory-server');
+
 // Database Connection & Admin Initialization
-mongoose.connect(process.env.MONGO_URI)
-    .then(async () => {
-        console.log('MongoDB Vault Connected.');
+const connectDB = async () => {
+    try {
+        const mongoServer = await MongoMemoryServer.create();
+        const mongoUri = mongoServer.getUri();
+        
+        await mongoose.connect(mongoUri);
+        console.log(`MongoDB Vault Connected (In-Memory: ${mongoUri}).`);
 
         // THE NUCLEAR OPTION: Add this line to wipe all users.
         await User.deleteMany({});
@@ -32,7 +38,11 @@ mongoose.connect(process.env.MONGO_URI)
             });
             console.log('The Sovereign Admin has been crowned.');
         }
-    }).catch(err => console.error('MongoDB Connection Failed:', err));
+    } catch (err) {
+        console.error('MongoDB Connection Failed:', err);
+    }
+};
+connectDB();
 /*// Database Connection & Admin Initialization
 mongoose.connect(process.env.MONGO_URI)
     .then(async () => {
